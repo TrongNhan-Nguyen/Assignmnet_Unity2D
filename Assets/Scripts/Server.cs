@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Server : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Server : MonoBehaviour
         //StartCoroutine(GetUser());
         //StartCoroutine(Login("testuser2", "qwerty"));
         //StartCoroutine(Register("testuser3","123456"));
+        //StartCoroutine(GetAllItems());
     }
 
     public IEnumerator GetDate()
@@ -34,9 +36,11 @@ public class Server : MonoBehaviour
             }
         }
     }
-     public IEnumerator GetUser()
+     public IEnumerator GetUser(string userID, System.Action<string> callback)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost/assignment/getuser.php"))
+        WWWForm form = new WWWForm();
+        form.AddField("userID", userID);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getuser.php",form))
         {
             yield return www.SendWebRequest();
 
@@ -47,10 +51,10 @@ public class Server : MonoBehaviour
             }
             else
             {
-                toast(www.downloadHandler.text);
-                clg(www.downloadHandler.text);
+                //clg(www.downloadHandler.text);
+                string jsonObject = www.downloadHandler.text;
+                callback(jsonObject);
 
-                byte[] results = www.downloadHandler.data;
             }
         }
     }
@@ -69,8 +73,10 @@ public class Server : MonoBehaviour
             }
             else
             {
-                toast(www.downloadHandler.text);
-                clg(www.downloadHandler.text);
+                toast("Login successfully");
+                UserInfo.UserName = username;
+                UserInfo.UserID = www.downloadHandler.text;
+                SceneManager.LoadScene("Profile");
             }
         }
 
@@ -95,6 +101,90 @@ public class Server : MonoBehaviour
             }
         }
 
+    }
+    public IEnumerator GetUserItems(string userID,System.Action<string> callback)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("userID", userID);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getuser_items.php",form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                toast(www.error);
+                clg(www.error);
+            }
+            else
+            {
+                string jsonArray = www.downloadHandler.text;
+                callback(jsonArray);
+               
+            }
+        }
+    }
+    public IEnumerator GetAllItems(System.Action<string> callback)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost/assignment/get_all_items.php"))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                toast(www.error);
+                clg(www.error);
+            }
+            else
+            {
+                string jsonArray = www.downloadHandler.text;
+                callback(jsonArray);
+            }
+        }
+    }
+
+    public IEnumerator GetItem(string itemID, System.Action<string> callback)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("itemID", itemID);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getitem.php", form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                toast(www.error);
+                clg(www.error);
+            }
+            else
+            {
+                string jsonArray = www.downloadHandler.text;
+                callback(jsonArray);
+
+            }
+        }
+    }
+    public IEnumerator GetItemIcon(string itemID, System.Action<Sprite> callback)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("itemID", itemID);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getitem_icon.php", form))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                toast(www.error);
+                clg(www.error);
+            }
+            else
+            {
+                byte[] bytes = www.downloadHandler.data;
+                Texture2D texture = new Texture2D(2, 2);
+                texture.LoadImage(bytes);
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                callback(sprite);
+            }
+        }
     }
     private void toast(string s)
     {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
@@ -20,7 +21,7 @@ public class Shop : MonoBehaviour
     public void CreateItems()
     {
 
-       StartCoroutine(Main.Instance.Server.GetDate());
+       StartCoroutine(GetAllItems(_createItemsCallback));
 
     }
 
@@ -31,7 +32,7 @@ public class Shop : MonoBehaviour
         for(int i = 0; i < jsonArray.Count; i++)
         {
             bool isDone = false;
-            string itemID = jsonArray[i].AsObject["itemID"];
+            string itemID = jsonArray[i].AsObject["id"];
             JSONObject itemInfoJson = new JSONObject();
             Action<string> getItemInfoCallback = (itemInfo) =>
             {
@@ -58,7 +59,24 @@ public class Shop : MonoBehaviour
             };
             StartCoroutine(Main.Instance.Server.GetItemIcon(itemID, getItemIconCallback));
         }
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
+    }
+    public IEnumerator GetAllItems(System.Action<string> callback)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost/assignment/get_all_items.php"))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                clg(www.error);
+            }
+            else
+            {
+                string jsonArray = www.downloadHandler.text;
+                callback(jsonArray);
+            }
+        }
     }
     private void clg(string s)
     {

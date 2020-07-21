@@ -58,6 +58,6 @@ public class Inventory : MonoBehaviour
             };
             StartCoroutine(Main.Instance.Server.GetItemIcon(itemID, getItemIconCallback));
         }
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

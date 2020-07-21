@@ -16,6 +16,7 @@ public class UserInfo : MonoBehaviour
     public Text coinsUser;
     Action<string> _createUserCallback;
     public GameObject Inventory;
+    private bool openInventory  = false;
     private void Start()
     {
         if (UserID != null)
@@ -25,20 +26,30 @@ public class UserInfo : MonoBehaviour
                 StartCoroutine(CreateUserRoutine(jsonObjectString));
             };
             CreateUser();
-            //StartCoroutine(Main.Instance.Server.GetUserItems(UserID));
         }
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            if (Inventory.activeSelf == false)
+            {
+                Inventory.SetActive(true);
+            }
+            else
+            {
+                Inventory.SetActive(false);
 
+            }
+
+        }
+
+
+    }
     private void FixedUpdate()
     {
-        //if (Input.GetKey(KeyCode.E))
-        //{
-        //    Inventory.SetActive(true);
-        //}
-        //else if (Input.GetKey(KeyCode.F))
-        //{
-        //    Inventory.SetActive(false);
-        //}
+       
+       
     }
     public void CreateUser()
     {

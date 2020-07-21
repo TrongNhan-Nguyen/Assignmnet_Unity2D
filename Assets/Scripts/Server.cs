@@ -123,25 +123,6 @@ public class Server : MonoBehaviour
             }
         }
     }
-    public IEnumerator GetAllItems(System.Action<string> callback)
-    {
-        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost/assignment/get_all_items.php"))
-        {
-            yield return www.SendWebRequest();
-
-            if (www.isNetworkError || www.isHttpError)
-            {
-                toast(www.error);
-                clg(www.error);
-            }
-            else
-            {
-                string jsonArray = www.downloadHandler.text;
-                callback(jsonArray);
-            }
-        }
-    }
-
     public IEnumerator GetItem(string itemID, System.Action<string> callback)
     {
         WWWForm form = new WWWForm();

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.WSA;
@@ -22,7 +23,7 @@ public class Register : MonoBehaviour
 
             if(name.Equals("") || pass.Equals(""))
             {
-                toast("User name or password can't be empty");
+                toast("Please, fill up this form");
             }
             else if(!pass.Equals(confirm))
             {
@@ -30,9 +31,7 @@ public class Register : MonoBehaviour
             }
             else
             {
-                StartCoroutine(Main.Instance.Server.Register(name, pass));
-                toast("Regsiter");
-
+                StartCoroutine(register(name, pass));
             }
         });
 
@@ -42,7 +41,39 @@ public class Register : MonoBehaviour
         });
 
     }
+    public IEnumerator register(string username, string password)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("registerUser", username);
+        form.AddField("registerPass", password);
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/register.php", form))
+        {
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+            {
+                toast(www.error);
+                clg(www.error);
+            }
+            else
+            {
+                if (www.downloadHandler.text == "Already exists")
+                {
+                    toast("User name already exists");
+                }
+                else
+                {
+                    toast("Register succeessfully");
+                }
+              
+            }
+        }
 
+    }
+
+    private void clg (string s)
+    {
+        Debug.Log(s);
+    }
     private void toast (string s)
     {
         SSTools.ShowMessage(s, SSTools.Position.bottom, SSTools.Time.twoSecond);

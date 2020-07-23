@@ -36,72 +36,28 @@ public class Server : MonoBehaviour
             }
         }
     }
-     public IEnumerator GetUser(string userID, System.Action<string> callback)
-    {
-        WWWForm form = new WWWForm();
-        form.AddField("userID", userID);
-        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getuser.php",form))
-        {
-            yield return www.SendWebRequest();
+    // public IEnumerator GetUser(string userID, System.Action<string> callback)
+    //{
+    //    WWWForm form = new WWWForm();
+    //    form.AddField("userID", userID);
+    //    using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getuser.php",form))
+    //    {
+    //        yield return www.SendWebRequest();
 
-            if (www.isNetworkError || www.isHttpError)
-            {
-                toast(www.error);
-                clg(www.error);
-            }
-            else
-            {
-                //clg(www.downloadHandler.text);
-                string jsonObject = www.downloadHandler.text;
-                callback(jsonObject);
+    //        if (www.isNetworkError || www.isHttpError)
+    //        {
+    //            toast(www.error);
+    //            clg(www.error);
+    //        }
+    //        else
+    //        {
+    //            //clg(www.downloadHandler.text);
+    //            string jsonObject = www.downloadHandler.text;
+    //            callback(jsonObject);
 
-            }
-        }
-    }
-    public IEnumerator Login(string username, string password)
-    {
-        WWWForm form = new WWWForm();
-        form.AddField("loginUser", username);
-        form.AddField("loginPass", password);
-        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/login.php",form))
-        {
-            yield return www.SendWebRequest();
-            if (www.isNetworkError || www.isHttpError)
-            {
-                toast(www.error);
-                clg(www.error);
-            }
-            else
-            {
-                toast("Login successfully");
-                UserInfo.UserName = username;
-                UserInfo.UserID = www.downloadHandler.text;
-                SceneManager.LoadScene("Profile");
-            }
-        }
-
-    }
-    public IEnumerator Register(string username, string password)
-    {
-        WWWForm form = new WWWForm();
-        form.AddField("registerUser", username);
-        form.AddField("registerPass", password);
-        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/register.php", form))
-        {
-            yield return www.SendWebRequest();
-            if (www.isNetworkError || www.isHttpError)
-            {
-                toast(www.error);
-                clg(www.error);
-            }
-            else
-            {
-                toast(www.downloadHandler.text);
-                clg(www.downloadHandler.text);
-            }
-        }
-
-    }
+    //        }
+    //    }
+    //}
     public IEnumerator GetUserItems(string userID,System.Action<string> callback)
     {
         WWWForm form = new WWWForm();
@@ -144,29 +100,7 @@ public class Server : MonoBehaviour
             }
         }
     }
-    public IEnumerator GetItemIcon(string itemID, System.Action<Sprite> callback)
-    {
-        WWWForm form = new WWWForm();
-        form.AddField("itemID", itemID);
-        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost/assignment/getitem_icon.php", form))
-        {
-            yield return www.SendWebRequest();
-
-            if (www.isNetworkError || www.isHttpError)
-            {
-                toast(www.error);
-                clg(www.error);
-            }
-            else
-            {
-                byte[] bytes = www.downloadHandler.data;
-                Texture2D texture = new Texture2D(2, 2);
-                texture.LoadImage(bytes);
-                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                callback(sprite);
-            }
-        }
-    }
+    
     private void toast(string s)
     {
         SSTools.ShowMessage(s, SSTools.Position.bottom, SSTools.Time.twoSecond);
